@@ -12,3 +12,6 @@ Beyond implementing the algorithms themselves, the main goals of this project we
 - QuickHull
 - Graham Scan
 - MergeHull
+
+
+*Some parts of this project were developed with the assistance of AI tools, used as a learning and support resource throughout the process.*
