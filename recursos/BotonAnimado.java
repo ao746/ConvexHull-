@@ -15,9 +15,9 @@ public class BotonAnimado extends JButton {
     public BotonAnimado(String texto) {
         super(texto);
 
-        colorNormal = new Color(60, 60, 60, 180);
-        colorHover  = new Color(90, 90, 90, 210);
-        colorClick  = new Color(30, 30, 30, 230);
+        colorNormal = new Color(18, 32, 58, 210);
+        colorHover  = new Color(30, 50, 120);
+        colorClick  = new Color(30,50,120);;
         colorActual = colorNormal;
 
         setOpaque(false);

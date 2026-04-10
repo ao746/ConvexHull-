@@ -111,34 +111,8 @@ public class GenerarDatos {
 
         return new ArrayList<>(set);
     }
-    public static ArrayList<Point> generarLineaRectaCreciente(int cantidad) {
-
-        HashSet<Point> set = new HashSet<>();
-        int id = 0;
-        while (set.size() < cantidad) {
-
-            int x= random.nextInt(1000000000);
-            int y = x*2+50;
-
-            set.add(new Point(x, y, id+10));
-        }
-
-        return new ArrayList<>(set);
-    }
-    public static ArrayList<Point> generarLineaRectaDecreciente(int cantidad) {
-
-    	HashSet<Point> set = new HashSet<>();
-        int id = 0;
-        while (set.size() < cantidad) {
-
-            int x= random.nextInt(1000000);
-            int y = x*(-200)+5000;
-
-            set.add(new Point(x, y, id++));
-        }
-
-        return new ArrayList<>(set);
-    }
+    
+    
     
 
 	public static ArrayList<Point> generarGaussiana(int cantidad) {

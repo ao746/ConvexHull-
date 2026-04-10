@@ -1,5 +1,6 @@
 package ConvexHull.interfaz;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 import  ConvexHull.algoritmos.ConvexHull;
 import ConvexHull.algoritmos.FuerzaBruta;
@@ -13,6 +14,7 @@ import ConvexHull.recursos.LectorPuntos;
 import ConvexHull.recursos.PanelTransparente;
 
 import java.awt.*;
+import java.awt.geom.RoundRectangle2D;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -66,9 +68,9 @@ public class VentanaPrincipal extends JFrame {
         });
 
         int altoPantalla = screen.height;
-        int tituloSize = Math.max(28, altoPantalla / 18);
-        int textoGrande = Math.max(18, altoPantalla / 45);
-        int textoNormal = Math.max(14, altoPantalla / 60);
+        int tituloSize   = Math.max(28, altoPantalla / 18);
+        int textoGrande  = Math.max(18, altoPantalla / 45);
+        int textoNormal  = Math.max(14, altoPantalla / 60);
 
         cardLayout = new CardLayout();
         contenedor = new JPanel(cardLayout);
@@ -78,7 +80,7 @@ public class VentanaPrincipal extends JFrame {
         // =========================
         // PANTALLA DE CONFIGURACIÓN
         // =========================
-        JPanel fondo = new PanelConFondo("/ConvexHull/decoration/fondo.png");
+        JPanel fondo = new PanelConFondo("/ConvexHull/decoration/fondu.png");
         fondo.setLayout(new GridBagLayout());
 
         JPanel entradas = new JPanel();
@@ -95,17 +97,13 @@ public class VentanaPrincipal extends JFrame {
         entradas.add(Box.createVerticalStrut(30));
 
         ComboAnimado algoritmosBoton = new ComboAnimado(new String[]{
-                "Brute Force",
-                "Jarvis",
-                "QuickHull",
-                "Graham Scan",
-                "MergeHull"
+                "Brute Force", "Jarvis", "QuickHull", "Graham Scan", "MergeHull"
         });
         algoritmosBoton.setAlignmentX(Component.CENTER_ALIGNMENT);
         algoritmosBoton.setPreferredSize(tamañoBoton);
         algoritmosBoton.setMaximumSize(tamañoBoton);
 
-        JButton exe = new BotonAnimado("Execute");
+        JButton exe        = new BotonAnimado("Execute");
         exe.setAlignmentX(Component.CENTER_ALIGNMENT);
         exe.setPreferredSize(tamañoBoton);
         exe.setMaximumSize(tamañoBoton);
@@ -145,7 +143,7 @@ public class VentanaPrincipal extends JFrame {
         // =====================
         // PANTALLA DE RESULTADOS
         // =====================
-        JPanel fondoSalida = new PanelConFondo("/ConvexHull/decoration/fondo10.png");
+        JPanel fondoSalida = new PanelConFondo("/ConvexHull/decoration/fondu.png");
         fondoSalida.setLayout(new BorderLayout());
 
         JPanel panelSalida = new JPanel(new BorderLayout(15, 15));
@@ -164,47 +162,112 @@ public class VentanaPrincipal extends JFrame {
 
         fondoSalida.add(panelSalida, BorderLayout.CENTER);
 
-        JPanel panelResultados = new PanelTransparente(0.55f);
-        panelResultados.setOpaque(false);
-        panelResultados.setLayout(new BoxLayout(panelResultados, BoxLayout.Y_AXIS));
-        panelResultados.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        panelResultados.setPreferredSize(new Dimension(260, 0));
-        panelResultados.setMinimumSize(new Dimension(220, 0));
+        // =====================
+        // PANEL RESULTADOS PRO
+        // =====================
+        JPanel panelResultados = new PanelResultadosPro();
+        panelResultados.setPreferredSize(new Dimension(320, 0));
+        panelResultados.setMinimumSize(new Dimension(290, 0));
 
-        JLabel tituloResultados = new JLabel("Results:");
-        tituloResultados.setFont(new Font("Segoe UI", Font.BOLD, textoGrande));
-        tituloResultados.setAlignmentX(Component.LEFT_ALIGNMENT);
-        tituloResultados.setForeground(Color.WHITE);
+        // --- Sección: tiempo destacado ---
+        JPanel cardTiempo = new MiniCard();
+        cardTiempo.setLayout(new BoxLayout(cardTiempo, BoxLayout.Y_AXIS));
+        cardTiempo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel etqTiempo = crearEtiqueta("EXECUTION TIME", 10, new Color(255, 255, 255, 110));
+        labelTiempo = crearValor("— ms", textoNormal + 6, Color.WHITE);
+        cardTiempo.add(etqTiempo);
+        cardTiempo.add(Box.createVerticalStrut(4));
+        cardTiempo.add(labelTiempo);
 
-        labelTiempo = crearLabelResultado("Execution time: ", textoNormal);
-        labelAlgoritmo = crearLabelResultado("Algorithm: ", textoNormal);
-        labelArchivo = crearLabelResultado("File: ", textoNormal);
-        labelDistribucion = crearLabelResultado("Distribution: ", textoNormal);
-        labelNumPuntos = crearLabelResultado("Points: ", textoNormal);
-        labelNumHull = crearLabelResultado("Hull points: ", textoNormal);
+        // --- Sección: algoritmo con badge ---
+        JPanel filaAlgo = new JPanel();
+        filaAlgo.setOpaque(false);
+        filaAlgo.setLayout(new BoxLayout(filaAlgo, BoxLayout.Y_AXIS));
+        filaAlgo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel etqAlgo = crearEtiqueta("ALGORITHM", 10, new Color(255, 255, 255, 110));
+        labelAlgoritmo = crearValor("—", textoNormal, Color.WHITE);
+        filaAlgo.add(etqAlgo);
+        filaAlgo.add(Box.createVerticalStrut(3));
+        filaAlgo.add(labelAlgoritmo);
 
-        panelResultados.add(tituloResultados);
-        panelResultados.add(Box.createVerticalStrut(35));
-        panelResultados.add(labelTiempo);
-        panelResultados.add(Box.createVerticalStrut(25));
-        panelResultados.add(labelAlgoritmo);
-        panelResultados.add(Box.createVerticalStrut(25));
-        panelResultados.add(labelArchivo);
-        panelResultados.add(Box.createVerticalStrut(25));
-        panelResultados.add(labelDistribucion);
-        panelResultados.add(Box.createVerticalStrut(25));
-        panelResultados.add(labelNumPuntos);
-        panelResultados.add(Box.createVerticalStrut(25));
-        panelResultados.add(labelNumHull);
+        // --- Grid: total puntos + hull puntos ---
+        JPanel grid = new JPanel(new GridLayout(1, 2, 10, 0));
+        grid.setOpaque(false);
+        grid.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JPanel cardPuntos = new MiniCard();
+        cardPuntos.setLayout(new BoxLayout(cardPuntos, BoxLayout.Y_AXIS));
+        JLabel etqPuntos = crearEtiqueta("TOTAL POINTS", 10, new Color(255, 255, 255, 110));
+        labelNumPuntos = crearValor("—", textoNormal + 2, Color.WHITE);
+        cardPuntos.add(etqPuntos);
+        cardPuntos.add(Box.createVerticalStrut(3));
+        cardPuntos.add(labelNumPuntos);
+
+        JPanel cardHull = new MiniCard();
+        cardHull.setLayout(new BoxLayout(cardHull, BoxLayout.Y_AXIS));
+        JLabel etqHull = crearEtiqueta("HULL POINTS", 10, new Color(255, 255, 255, 110));
+        labelNumHull = crearValor("—", textoNormal + 2, new Color(93, 202, 165));
+        cardHull.add(etqHull);
+        cardHull.add(Box.createVerticalStrut(3));
+        cardHull.add(labelNumHull);
+
+        grid.add(cardPuntos);
+        grid.add(cardHull);
+
+        // --- Distribución ---
+        JPanel filaDist = new JPanel();
+        filaDist.setOpaque(false);
+        filaDist.setLayout(new BoxLayout(filaDist, BoxLayout.Y_AXIS));
+        filaDist.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel etqDist = crearEtiqueta("DISTRIBUTION", 10, new Color(255, 255, 255, 110));
+        labelDistribucion = crearValor("—", textoNormal, Color.WHITE);
+        filaDist.add(etqDist);
+        filaDist.add(Box.createVerticalStrut(3));
+        filaDist.add(labelDistribucion);
+
+        // --- Archivo ---
+        JPanel filaArchivo = new JPanel();
+        filaArchivo.setOpaque(false);
+        filaArchivo.setLayout(new BoxLayout(filaArchivo, BoxLayout.Y_AXIS));
+        filaArchivo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel etqArchivo = crearEtiqueta("SOURCE", 10, new Color(255, 255, 255, 110));
+        labelArchivo = crearValor("—", textoNormal, new Color(255, 255, 255, 180));
+        filaArchivo.add(etqArchivo);
+        filaArchivo.add(Box.createVerticalStrut(3));
+        filaArchivo.add(labelArchivo);
+
+        // --- Logo centrado y grande ---
+        JPanel logoZona = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 8));
+        logoZona.setOpaque(false);
+        logoZona.setAlignmentX(Component.LEFT_ALIGNMENT);
+        logoZona.setMaximumSize(new Dimension(Integer.MAX_VALUE, 155));
 
         ImageIcon logoMarca = new ImageIcon(getClass().getResource("/ConvexHull/decoration/logoo.png"));
-        Image imgEscalada = logoMarca.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH);
+        Image imgEscalada = logoMarca.getImage().getScaledInstance(128, 128, Image.SCALE_SMOOTH);
         JLabel marcaAgua = new JLabel(new ImageIcon(imgEscalada));
-        marcaAgua.setAlignmentX(Component.LEFT_ALIGNMENT);
+        logoZona.add(marcaAgua);
 
+        // --- Ensamblar panel ---
+        panelResultados.add(Box.createVerticalStrut(18));
+        panelResultados.add(cardTiempo);
+        panelResultados.add(Box.createVerticalStrut(14));
+        panelResultados.add(new Separador());
+        panelResultados.add(Box.createVerticalStrut(14));
+        panelResultados.add(filaAlgo);
+        panelResultados.add(Box.createVerticalStrut(14));
+        panelResultados.add(new Separador());
+        panelResultados.add(Box.createVerticalStrut(14));
+        panelResultados.add(grid);
+        panelResultados.add(Box.createVerticalStrut(14));
+        panelResultados.add(new Separador());
+        panelResultados.add(Box.createVerticalStrut(14));
+        panelResultados.add(filaDist);
+        panelResultados.add(Box.createVerticalStrut(14));
+        panelResultados.add(filaArchivo);
         panelResultados.add(Box.createVerticalGlue());
-        panelResultados.add(Box.createVerticalStrut(20));
-        panelResultados.add(marcaAgua);
+        panelResultados.add(new Separador());
+        panelResultados.add(logoZona);
+        panelResultados.add(Box.createVerticalStrut(10));
 
         panelSalida.add(panelResultados, BorderLayout.EAST);
         contenedor.add(fondoSalida, "salida");
@@ -218,7 +281,6 @@ public class VentanaPrincipal extends JFrame {
         selecArchivo.addActionListener(e -> {
             JFileChooser elegir = new JFileChooser();
             int resultado = elegir.showOpenDialog(this);
-
             if (resultado == JFileChooser.APPROVE_OPTION) {
                 archivo = elegir.getSelectedFile();
                 nombreArchivo.setText("Selected file: " + archivo.getName());
@@ -235,15 +297,8 @@ public class VentanaPrincipal extends JFrame {
             dialog.setLayout(new BorderLayout());
 
             ComboAnimado dist = new ComboAnimado(new String[]{
-                    "Cuadrado",
-                    "Círculo",
-                    "Triángulo",
-                    "Rombo",
-                    "Línea recta Horizontal",
-                    "Línea recta Vertical",
-                    "Línea recta Creciente",
-                    "Línea recta Decreciente",
-                    "Gausiana"
+                    "Cuadrado", "Círculo", "Triángulo", "Rombo",
+                    "Línea recta Horizontal", "Línea recta Vertical", "Gausiana"
             });
             dist.setPreferredSize(tamañoBoton);
             dist.setMaximumSize(tamañoBoton);
@@ -260,15 +315,12 @@ public class VentanaPrincipal extends JFrame {
             pestaña.setOpaque(true);
             pestaña.setLayout(new BoxLayout(pestaña, BoxLayout.Y_AXIS));
             pestaña.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
             pestaña.add(dist);
             pestaña.add(Box.createVerticalStrut(15));
-
             JPanel panelCantidad = new JPanel();
             panelCantidad.add(new JLabel("Number of points: "));
             panelCantidad.add(cantidad);
             pestaña.add(panelCantidad);
-
             pestaña.add(Box.createVerticalStrut(20));
             pestaña.add(aceptar);
 
@@ -313,74 +365,74 @@ public class VentanaPrincipal extends JFrame {
             long end = System.nanoTime();
             tiempo = (end - start) / 1_000_000.0;
 
-            if (hull == null) {
-                hull = new ArrayList<>();
-            }
+            if (hull == null) hull = new ArrayList<>();
 
             panelDibujo.setDatos(puntos, hull);
+            panelDibujo.iniciarFadePoints(() -> {
+                panelDibujo.animarHull(hull, () -> {
+                    String tiempoStr = String.format("%.2f ms", tiempo);
+                    labelTiempo.setText(tiempoStr);
+                    labelAlgoritmo.setText(algoElegido);
+                    labelDistribucion.setText(distElegida != null ? distElegida : "File input");
+                    labelNumPuntos.setText(String.format("%,d", puntos.size()));
+                    labelNumHull.setText(String.format("%,d", hull.size()));
+                    labelArchivo.setText(archivo != null && useFile ? archivo.getName() : "Generated · no file");
+                });
+            });
+
             cardLayout.show(contenedor, "salida");
-
-            labelTiempo.setText("Time: " + tiempo + " ms");
-            labelAlgoritmo.setText("Algorithm: " + algoElegido);
-            labelDistribucion.setText("Distribution: " + (distElegida != null ? distElegida : "File input"));
-            labelNumPuntos.setText("Points: " + puntos.size());
-            labelNumHull.setText("Hull Points: " + hull.size());
-
-            if (archivo != null && useFile) {
-                labelArchivo.setText("File name: " + archivo.getName());
-            } else {
-                labelArchivo.setText("File name: No file");
-            }
         });
     }
 
-    private JLabel crearLabelResultado(String texto, int size) {
-        JLabel label = new JLabel(texto);
-        label.setFont(new Font("Segoe UI", Font.BOLD, size));
-        label.setForeground(Color.WHITE);
-        label.setAlignmentX(Component.LEFT_ALIGNMENT);
-        return label;
+    // =====================
+    // HELPERS LABELS
+    // =====================
+
+    private JLabel crearEtiqueta(String texto, int size, Color color) {
+        JLabel l = new JLabel(texto);
+        l.setFont(new Font("Segoe UI", Font.BOLD, size));
+        l.setForeground(color);
+        l.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return l;
     }
 
+    private JLabel crearValor(String texto, int size, Color color) {
+        JLabel l = new JLabel(texto);
+        l.setFont(new Font("Segoe UI", Font.BOLD, size));
+        l.setForeground(color);
+        l.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return l;
+    }
+
+    // =====================
+    // LÓGICA
+    // =====================
+
     public ArrayList<Point> generarRandom(String dist) {
-        if (dist.equals("Cuadrado")) {
-            return GenerarDatos.generarCuadrado(numPuntos);
-        } else if (dist.equals("Círculo")) {
-            return GenerarDatos.generarCirculo(numPuntos);
-        } else if (dist.equals("Triángulo")) {
-            return GenerarDatos.generarTriangulo(numPuntos);
-        } else if (dist.equals("Rombo")) {
-            return GenerarDatos.generarRombo(numPuntos);
-        } else if (dist.equals("Línea recta Horizontal")) {
-            return GenerarDatos.generarLineaRectaHorizontal(numPuntos);
-        } else if (dist.equals("Línea recta Vertical")) {
-            return GenerarDatos.generarLineaRectaVertical(numPuntos);
-        } else if (dist.equals("Línea recta Creciente")) {
-            return GenerarDatos.generarLineaRectaCreciente(numPuntos);
-        } else if (dist.equals("Línea recta Decreciente")) {
-            return GenerarDatos.generarLineaRectaDecreciente(numPuntos);
-        } else if (dist.equals("Gausiana")) {
-            return GenerarDatos.generarGaussiana(numPuntos);
-        } else {
-            JOptionPane.showMessageDialog(this, "An error has occurred");
-            return new ArrayList<>();
+        switch (dist) {
+            case "Cuadrado":               return GenerarDatos.generarCuadrado(numPuntos);
+            case "Círculo":                return GenerarDatos.generarCirculo(numPuntos);
+            case "Triángulo":              return GenerarDatos.generarTriangulo(numPuntos);
+            case "Rombo":                  return GenerarDatos.generarRombo(numPuntos);
+            case "Línea recta Horizontal": return GenerarDatos.generarLineaRectaHorizontal(numPuntos);
+            case "Línea recta Vertical":   return GenerarDatos.generarLineaRectaVertical(numPuntos);
+            case "Gausiana":               return GenerarDatos.generarGaussiana(numPuntos);
+            default:
+                JOptionPane.showMessageDialog(this, "An error has occurred");
+                return new ArrayList<>();
         }
     }
 
     public ArrayList<Point> algoritmoElegido(String algo, ArrayList<Point> puntos) {
-        if (algo.equals("Brute Force")) {
-            return FuerzaBruta.calcularHull(puntos);
-        } else if (algo.equals("Jarvis")) {
-            return JarvisMarch.calcularHull(puntos);
-        } else if (algo.equals("QuickHull")) {
-            return QuickHull.calcularHull(puntos);
-        } else if (algo.equals("Graham Scan")) {
-            return ConvexHull.GrahamScanConvexHull(puntos);
-        } else if (algo.equals("MergeHull")) {
-            return ConvexHull.computeMergeHull(puntos);
-        } else {
-            JOptionPane.showMessageDialog(this, "An error has occurred");
-            return new ArrayList<>();
+        switch (algo) {
+            case "Brute Force": return FuerzaBruta.calcularHull(puntos);
+            case "Jarvis":      return JarvisMarch.calcularHull(puntos);
+            case "QuickHull":   return QuickHull.calcularHull(puntos);
+            case "Graham Scan": return ConvexHull.GrahamScanConvexHull(puntos);
+            case "MergeHull":   return ConvexHull.computeMergeHull(puntos);
+            default:
+                JOptionPane.showMessageDialog(this, "An error has occurred");
+                return new ArrayList<>();
         }
     }
 
@@ -388,10 +440,84 @@ public class VentanaPrincipal extends JFrame {
         SwingUtilities.invokeLater(VentanaPrincipal::new);
     }
 
+    // =====================
+    // CLASES INTERNAS UI
+    // =====================
+
+    private static class PanelResultadosPro extends JPanel {
+        private static final Color COLOR_FONDO    = new Color(18, 32, 58, 210);
+        private static final Color COLOR_ACENTO_1 = new Color(55, 138, 221);
+        private static final Color COLOR_ACENTO_2 = new Color(29, 158, 117);
+        private static final int   BARRA_ALTO     = 4;
+        private static final int   RADIO          = 14;
+
+        PanelResultadosPro() {
+            setOpaque(false);
+            setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+            setBorder(new EmptyBorder(BARRA_ALTO + 10, 16, 16, 16));
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            int w = getWidth(), h = getHeight();
+
+            g2.setColor(COLOR_FONDO);
+            g2.fill(new RoundRectangle2D.Float(0, 0, w, h, RADIO, RADIO));
+
+            GradientPaint gp = new GradientPaint(0, 0, COLOR_ACENTO_1, w, 0, COLOR_ACENTO_2);
+            g2.setPaint(gp);
+            g2.fill(new RoundRectangle2D.Float(0, 0, w, RADIO, RADIO, RADIO));
+            g2.fillRect(0, RADIO / 2, w, BARRA_ALTO);
+
+            g2.dispose();
+        }
+    }
+
+    private static class MiniCard extends JPanel {
+        private static final Color BG = new Color(255, 255, 255, 18);
+
+        MiniCard() {
+            setOpaque(false);
+            setBorder(new EmptyBorder(8, 10, 8, 10));
+            setAlignmentX(Component.LEFT_ALIGNMENT);
+            setMaximumSize(new Dimension(Integer.MAX_VALUE, 72));
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(BG);
+            g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 10, 10));
+            g2.setColor(new Color(255, 255, 255, 28));
+            g2.setStroke(new BasicStroke(0.8f));
+            g2.draw(new RoundRectangle2D.Float(0.4f, 0.4f, getWidth() - 0.8f, getHeight() - 0.8f, 10, 10));
+            g2.dispose();
+        }
+    }
+
+    private static class Separador extends JPanel {
+        Separador() {
+            setOpaque(false);
+            setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+            setPreferredSize(new Dimension(1, 1));
+            setAlignmentX(Component.LEFT_ALIGNMENT);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            g.setColor(new Color(255, 255, 255, 40));
+            g.fillRect(0, 0, getWidth(), 1);
+        }
+    }
+
     private static class PanelConFondo extends JPanel {
         private final Image imagen;
 
-        public PanelConFondo(String ruta) {
+        PanelConFondo(String ruta) {
             this.imagen = new ImageIcon(getClass().getResource(ruta)).getImage();
             setOpaque(true);
         }
