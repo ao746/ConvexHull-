@@ -1,8 +1,9 @@
 package ConvexHull.interfaz;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import  ConvexHull.algoritmos.ConvexHull;
+import ConvexHull.algoritmos.ConvexHull;
 import ConvexHull.algoritmos.FuerzaBruta;
 import ConvexHull.algoritmos.JarvisMarch;
 import ConvexHull.algoritmos.Point;
@@ -14,10 +15,13 @@ import ConvexHull.recursos.LectorPuntos;
 import ConvexHull.recursos.PanelTransparente;
 
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.geom.RoundRectangle2D;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 public class VentanaPrincipal extends JFrame {
 
@@ -32,6 +36,7 @@ public class VentanaPrincipal extends JFrame {
     private ArrayList<Point> puntos;
     private ArrayList<Point> hull;
     private PanelDibujo panelDibujo;
+    private PantallaEspera pantallaEspera;
     private Double tiempo;
 
     private JLabel labelTiempo;
@@ -52,7 +57,7 @@ public class VentanaPrincipal extends JFrame {
 
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         int anchoNormal = (int) (screen.width * 0.75);
-        int altoNormal = (int) (screen.height * 0.75);
+        int altoNormal  = (int) (screen.height * 0.75);
 
         setMinimumSize(new Dimension(900, 600));
         setSize(anchoNormal, altoNormal);
@@ -68,9 +73,8 @@ public class VentanaPrincipal extends JFrame {
         });
 
         int altoPantalla = screen.height;
-        int tituloSize   = Math.max(28, altoPantalla / 18);
-        int textoGrande  = Math.max(18, altoPantalla / 45);
-        int textoNormal  = Math.max(14, altoPantalla / 60);
+        int tituloSize  = Math.max(28, altoPantalla / 18);
+        int textoNormal = Math.max(14, altoPantalla / 60);
 
         cardLayout = new CardLayout();
         contenedor = new JPanel(cardLayout);
@@ -103,7 +107,7 @@ public class VentanaPrincipal extends JFrame {
         algoritmosBoton.setPreferredSize(tamañoBoton);
         algoritmosBoton.setMaximumSize(tamañoBoton);
 
-        JButton exe        = new BotonAnimado("Execute");
+        JButton exe = new BotonAnimado("Execute");
         exe.setAlignmentX(Component.CENTER_ALIGNMENT);
         exe.setPreferredSize(tamañoBoton);
         exe.setMaximumSize(tamañoBoton);
@@ -150,9 +154,23 @@ public class VentanaPrincipal extends JFrame {
         panelSalida.setOpaque(false);
         panelSalida.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
+        // panelDibujo con layout null para superponer pantallaEspera
         panelDibujo = new PanelDibujo();
         panelDibujo.setOpaque(false);
         panelDibujo.setMinimumSize(new Dimension(400, 300));
+        panelDibujo.setLayout(null);
+
+        pantallaEspera = new PantallaEspera();
+        pantallaEspera.setVisible(false);
+        panelDibujo.add(pantallaEspera);
+
+        panelDibujo.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                pantallaEspera.setBounds(0, 0, panelDibujo.getWidth(), panelDibujo.getHeight());
+            }
+        });
+
         panelSalida.add(panelDibujo, BorderLayout.CENTER);
 
         JButton repetir = new BotonAnimado("New execution");
@@ -169,7 +187,6 @@ public class VentanaPrincipal extends JFrame {
         panelResultados.setPreferredSize(new Dimension(320, 0));
         panelResultados.setMinimumSize(new Dimension(290, 0));
 
-        // --- Sección: tiempo destacado ---
         JPanel cardTiempo = new MiniCard();
         cardTiempo.setLayout(new BoxLayout(cardTiempo, BoxLayout.Y_AXIS));
         cardTiempo.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -179,7 +196,6 @@ public class VentanaPrincipal extends JFrame {
         cardTiempo.add(Box.createVerticalStrut(4));
         cardTiempo.add(labelTiempo);
 
-        // --- Sección: algoritmo con badge ---
         JPanel filaAlgo = new JPanel();
         filaAlgo.setOpaque(false);
         filaAlgo.setLayout(new BoxLayout(filaAlgo, BoxLayout.Y_AXIS));
@@ -190,7 +206,6 @@ public class VentanaPrincipal extends JFrame {
         filaAlgo.add(Box.createVerticalStrut(3));
         filaAlgo.add(labelAlgoritmo);
 
-        // --- Grid: total puntos + hull puntos ---
         JPanel grid = new JPanel(new GridLayout(1, 2, 10, 0));
         grid.setOpaque(false);
         grid.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -214,7 +229,6 @@ public class VentanaPrincipal extends JFrame {
         grid.add(cardPuntos);
         grid.add(cardHull);
 
-        // --- Distribución ---
         JPanel filaDist = new JPanel();
         filaDist.setOpaque(false);
         filaDist.setLayout(new BoxLayout(filaDist, BoxLayout.Y_AXIS));
@@ -225,7 +239,6 @@ public class VentanaPrincipal extends JFrame {
         filaDist.add(Box.createVerticalStrut(3));
         filaDist.add(labelDistribucion);
 
-        // --- Archivo ---
         JPanel filaArchivo = new JPanel();
         filaArchivo.setOpaque(false);
         filaArchivo.setLayout(new BoxLayout(filaArchivo, BoxLayout.Y_AXIS));
@@ -236,7 +249,6 @@ public class VentanaPrincipal extends JFrame {
         filaArchivo.add(Box.createVerticalStrut(3));
         filaArchivo.add(labelArchivo);
 
-        // --- Logo centrado y grande ---
         JPanel logoZona = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 8));
         logoZona.setOpaque(false);
         logoZona.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -247,7 +259,6 @@ public class VentanaPrincipal extends JFrame {
         JLabel marcaAgua = new JLabel(new ImageIcon(imgEscalada));
         logoZona.add(marcaAgua);
 
-        // --- Ensamblar panel ---
         panelResultados.add(Box.createVerticalStrut(18));
         panelResultados.add(cardTiempo);
         panelResultados.add(Box.createVerticalStrut(14));
@@ -278,13 +289,14 @@ public class VentanaPrincipal extends JFrame {
         // =====================
         // LISTENERS
         // =====================
+
         selecArchivo.addActionListener(e -> {
             JFileChooser elegir = new JFileChooser();
             int resultado = elegir.showOpenDialog(this);
             if (resultado == JFileChooser.APPROVE_OPTION) {
                 archivo = elegir.getSelectedFile();
                 nombreArchivo.setText("Selected file: " + archivo.getName());
-                useFile = true;
+                useFile     = true;
                 useGenerador = false;
                 distElegida = null;
             }
@@ -325,11 +337,11 @@ public class VentanaPrincipal extends JFrame {
             pestaña.add(aceptar);
 
             aceptar.addActionListener(ex -> {
-                distElegida = (String) dist.getSelectedItem();
-                numPuntos = (int) cantidad.getValue();
+                distElegida  = (String) dist.getSelectedItem();
+                numPuntos    = (int) cantidad.getValue();
                 useGenerador = true;
-                useFile = false;
-                archivo = null;
+                useFile      = false;
+                archivo      = null;
                 nombreArchivo.setText("Random generation selected");
                 dialog.dispose();
             });
@@ -360,27 +372,81 @@ public class VentanaPrincipal extends JFrame {
                 return;
             }
 
-            long start = System.nanoTime();
-            hull = algoritmoElegido(algoElegido, puntos);
-            long end = System.nanoTime();
-            tiempo = (end - start) / 1_000_000.0;
+            // Limpiar panel y cambiar a pantalla de resultados
+            panelDibujo.limpiar();
+            cardLayout.show(contenedor, "salida");
 
-            if (hull == null) hull = new ArrayList<>();
+            // Capturar variables finales para el worker
+            final ArrayList<Point> puntosFinales = new ArrayList<>(puntos);
+            final String algoFinal    = algoElegido;
+            final String distFinal    = distElegida;
+            final File   archivoFinal = archivo;
+            final boolean useFileFinal = useFile;
 
-            panelDibujo.setDatos(puntos, hull);
-            panelDibujo.iniciarFadePoints(() -> {
-                panelDibujo.animarHull(hull, () -> {
-                    String tiempoStr = String.format("%.2f ms", tiempo);
-                    labelTiempo.setText(tiempoStr);
-                    labelAlgoritmo.setText(algoElegido);
-                    labelDistribucion.setText(distElegida != null ? distElegida : "File input");
-                    labelNumPuntos.setText(String.format("%,d", puntos.size()));
-                    labelNumHull.setText(String.format("%,d", hull.size()));
-                    labelArchivo.setText(archivo != null && useFile ? archivo.getName() : "Generated · no file");
+            // Guardar resultado del algoritmo mientras la carga termina
+            final ArrayList<Point>[] hullHolder = new ArrayList[1];
+            final long[]             tiempos     = new long[2];
+
+            // Mostrar pantalla de carga; el callback se ejecuta cuando barra llega al 100%
+            SwingUtilities.invokeLater(() -> {
+                pantallaEspera.setBounds(0, 0, panelDibujo.getWidth(), panelDibujo.getHeight());
+                pantallaEspera.setVisible(true);
+                pantallaEspera.iniciar(algoFinal, puntosFinales.size(), () -> {
+                    // Este callback se ejecuta en el EDT cuando la barra llega al 100%
+                    // En este punto el algoritmo ya terminó (marcarAlgoritmoTerminado fue llamado)
+                    ArrayList<Point> hullFinal = hullHolder[0] != null ? hullHolder[0] : new ArrayList<>();
+                    tiempo = (tiempos[1] - tiempos[0]) / 1_000_000.0;
+
+                    pantallaEspera.detener();
+                    pantallaEspera.setVisible(false);
+
+                    panelDibujo.setDatos(puntosFinales, hullFinal);
+
+                    Timer inicio = new Timer(50, ev -> {
+                        ((Timer) ev.getSource()).stop();
+                        panelDibujo.iniciarFadePoints(() ->
+                            panelDibujo.animarHull(hullFinal, () -> {
+                                labelTiempo.setText(String.format("%.2f ms", tiempo));
+                                labelAlgoritmo.setText(algoFinal);
+                                labelDistribucion.setText(distFinal != null ? distFinal : "File input");
+                                labelNumPuntos.setText(String.format("%,d", puntosFinales.size()));
+                                labelNumHull.setText(String.format("%,d", hullFinal.size()));
+                                labelArchivo.setText(archivoFinal != null && useFileFinal
+                                        ? archivoFinal.getName() : "Generated · no file");
+                            })
+                        );
+                    });
+                    inicio.setRepeats(false);
+                    inicio.start();
                 });
+                panelDibujo.repaint();
             });
 
-            cardLayout.show(contenedor, "salida");
+            // Ejecutar algoritmo en hilo de fondo
+            SwingWorker<ArrayList<Point>, Void> worker = new SwingWorker<>() {
+                @Override
+                protected ArrayList<Point> doInBackground() {
+                    tiempos[0] = System.nanoTime();
+                    ArrayList<Point> resultado = algoritmoElegido(algoFinal, puntosFinales);
+                    tiempos[1] = System.nanoTime();
+                    return resultado;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        hullHolder[0] = get();
+                    } catch (InterruptedException | ExecutionException ex) {
+                        hullHolder[0] = new ArrayList<>();
+                    }
+                    if (hullHolder[0] == null) hullHolder[0] = new ArrayList<>();
+
+                    // Avisar a la pantalla de carga que el algoritmo terminó.
+                    // La barra completará el 100% cuando ADEMÁS pasen los 3 segundos.
+                    SwingUtilities.invokeLater(() -> pantallaEspera.marcarAlgoritmoTerminado());
+                }
+            };
+            worker.execute();
         });
     }
 
@@ -461,17 +527,13 @@ public class VentanaPrincipal extends JFrame {
         protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
             int w = getWidth(), h = getHeight();
-
             g2.setColor(COLOR_FONDO);
             g2.fill(new RoundRectangle2D.Float(0, 0, w, h, RADIO, RADIO));
-
             GradientPaint gp = new GradientPaint(0, 0, COLOR_ACENTO_1, w, 0, COLOR_ACENTO_2);
             g2.setPaint(gp);
             g2.fill(new RoundRectangle2D.Float(0, 0, w, RADIO, RADIO, RADIO));
             g2.fillRect(0, RADIO / 2, w, BARRA_ALTO);
-
             g2.dispose();
         }
     }

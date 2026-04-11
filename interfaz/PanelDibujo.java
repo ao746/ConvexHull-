@@ -73,16 +73,25 @@ public class PanelDibujo extends JPanel implements MouseWheelListener, MouseList
         return p.getX() + "," + p.getY();
     }
 
-    public void setDatos(ArrayList<Point> puntos, ArrayList<Point> hull) {
-        this.puntos          = puntos;
-        this.hull            = new ArrayList<>();
-        this.hullParcial     = new ArrayList<>();
-        this.hullIds         = new HashSet<>();
-        this.hullCerrado     = false;
-        this.rellenoVisible  = false;
-        this.alphaRelleno    = 0f;
-        repaint();
+   public void setDatos(ArrayList<Point> puntos, ArrayList<Point> hull) {
+    // Parar cualquier animación en curso
+    for (Timer t : new Timer[]{fadeTimer, hullTimer, pulsoTimer, destelloTimer, rellenoTimer}) {
+        if (t != null) t.stop();
     }
+
+    this.puntos         = puntos;
+    this.hull           = new ArrayList<>();
+    this.hullParcial    = new ArrayList<>();
+    this.hullIds        = new HashSet<>();
+    this.hullCerrado    = false;
+    this.rellenoVisible = false;
+    this.alphaRelleno   = 0f;
+    this.alphaPoints    = 0f;
+    this.pulsoActivo    = false;
+    this.destelloActivo = false;
+
+    repaint();
+}
 
     // =========================================================
     // PAINT
