@@ -309,8 +309,8 @@ public class VentanaPrincipal extends JFrame {
             dialog.setLayout(new BorderLayout());
 
             ComboAnimado dist = new ComboAnimado(new String[]{
-                    "Cuadrado", "Círculo", "Triángulo", "Rombo",
-                    "Línea recta Horizontal", "Línea recta Vertical", "Gausiana"
+                    "Square", "Circle", "Triangle", "Diamond",
+                    "Horizontal straight line", "Vertical straight line", "Gaussian"
             });
             dist.setPreferredSize(tamañoBoton);
             dist.setMaximumSize(tamañoBoton);
@@ -476,13 +476,13 @@ public class VentanaPrincipal extends JFrame {
 
     public ArrayList<Point> generarRandom(String dist) {
         switch (dist) {
-            case "Cuadrado":               return GenerarDatos.generarCuadrado(numPuntos);
-            case "Círculo":                return GenerarDatos.generarCirculo(numPuntos);
-            case "Triángulo":              return GenerarDatos.generarTriangulo(numPuntos);
-            case "Rombo":                  return GenerarDatos.generarRombo(numPuntos);
-            case "Línea recta Horizontal": return GenerarDatos.generarLineaRectaHorizontal(numPuntos);
-            case "Línea recta Vertical":   return GenerarDatos.generarLineaRectaVertical(numPuntos);
-            case "Gausiana":               return GenerarDatos.generarGaussiana(numPuntos);
+            case "Square":               return GenerarDatos.generarCuadrado(numPuntos);
+            case "Circle":                return GenerarDatos.generarCirculo(numPuntos);
+            case "Triangle":              return GenerarDatos.generarTriangulo(numPuntos);
+            case "Diamond":                  return GenerarDatos.generarRombo(numPuntos);
+            case "Horizontal straight line": return GenerarDatos.generarLineaRectaHorizontal(numPuntos);
+            case "Vertical straight line":   return GenerarDatos.generarLineaRectaVertical(numPuntos);
+            case "Gaussian":               return GenerarDatos.generarGaussiana(numPuntos);
             default:
                 JOptionPane.showMessageDialog(this, "An error has occurred");
                 return new ArrayList<>();
